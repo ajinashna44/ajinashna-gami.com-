@@ -1,0 +1,6 @@
+{
+  "name": "Crypto Converter",
+  "description": "Live BTC, ETH, BNB price tracker and instant converter to INR and USD",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
