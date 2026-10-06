@@ -1,0 +1,1376 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Linguaverse — Learn Every Language on Earth</title>
+<meta name="description" content="Linguaverse helps you explore and learn all 7,000+ living languages on Earth with spaced repetition, native audio, and real-world practice." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', '"Noto Sans"', 'sans-serif']
+        },
+        colors: {
+          ink: '#05060f',
+          surface: '#0b0e1e',
+          line: 'rgba(255,255,255,0.09)'
+        },
+        boxShadow: {
+          glow: '0 20px 60px -25px rgba(99,102,241,.75)',
+          soft: '0 24px 60px -30px rgba(0,0,0,.9)'
+        }
+      }
+    }
+  }
+</script>
+<style>
+  :root{
+    --bg:#05060f;
+    --surface:rgba(255,255,255,.045);
+    --line:rgba(255,255,255,.09);
+    --txt:#e9ecf5;
+    --muted:#98a1bd;
+    --i1:#6366f1;
+    --i2:#a855f7;
+    --i3:#22d3ee;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--txt);
+    font-family:"Plus Jakarta Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  ::selection{background:rgba(168,85,247,.35)}
+
+  /* ---------- Scrollbar ---------- */
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:#070814}
+  ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#4f46e5,#a855f7);border-radius:99px;border:2px solid #070814}
+  ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#6366f1,#c084fc)}
+
+  /* ---------- Aurora background ---------- */
+  .aurora{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .aurora i{position:absolute;display:block;border-radius:50%;filter:blur(80px);opacity:.4;will-change:transform}
+  .aurora i:nth-child(1){width:46vw;height:46vw;min-width:340px;min-height:340px;background:radial-gradient(circle at 30% 30%,#4f46e5,transparent 70%);top:-12vw;left:-8vw;animation:drift 22s ease-in-out infinite}
+  .aurora i:nth-child(2){width:40vw;height:40vw;min-width:300px;min-height:300px;background:radial-gradient(circle at 60% 40%,#a855f7,transparent 70%);top:18vh;right:-12vw;animation:drift 28s ease-in-out infinite reverse}
+  .aurora i:nth-child(3){width:36vw;height:36vw;min-width:260px;min-height:260px;background:radial-gradient(circle at 50% 50%,#0ea5e9,transparent 70%);bottom:-14vw;left:26vw;animation:drift 34s ease-in-out infinite}
+  @keyframes drift{
+    0%,100%{transform:translate3d(0,0,0) scale(1)}
+    33%{transform:translate3d(4vw,3vh,0) scale(1.08)}
+    66%{transform:translate3d(-3vw,-2vh,0) scale(.95)}
+  }
+
+  /* ---------- Utility ---------- */
+  .glass{
+    background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
+    border:1px solid var(--line);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+  }
+  .grad-text{
+    background:linear-gradient(100deg,#818cf8 0%,#c084fc 40%,#22d3ee 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .btn-primary{
+    background:linear-gradient(100deg,#4f46e5,#a855f7 55%,#22d3ee 130%);
+    box-shadow:0 16px 40px -16px rgba(124,58,237,.9);
+    transition:transform .25s cubic-bezier(.2,.7,.2,1), box-shadow .25s, filter .25s;
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 22px 50px -16px rgba(124,58,237,1);filter:brightness(1.08)}
+  .btn-primary:active{transform:translateY(0) scale(.99)}
+  .btn-ghost{transition:background .25s,border-color .25s,transform .25s}
+  .btn-ghost:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.22);transform:translateY(-2px)}
+
+  /* ---------- Reveal ---------- */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- Marquee ---------- */
+  .marquee{display:flex;width:max-content;animation:scroll 42s linear infinite}
+  .marquee:hover{animation-play-state:paused}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ---------- Language cards ---------- */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .lang-card{animation:fadeUp .5s cubic-bezier(.2,.7,.2,1) both}
+  .lang-card{
+    background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.015));
+    border:1px solid var(--line);
+    transition:transform .3s cubic-bezier(.2,.7,.2,1), border-color .3s, box-shadow .3s, background .3s;
+  }
+  .lang-card:hover{
+    transform:translateY(-5px);
+    border-color:rgba(168,85,247,.5);
+    box-shadow:0 26px 50px -30px rgba(124,58,237,.95);
+    background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.02));
+  }
+  .dot{display:inline-block;width:6px;height:6px;border-radius:99px;background:rgba(255,255,255,.16)}
+  .dot.on{background:linear-gradient(90deg,#818cf8,#22d3ee);box-shadow:0 0 8px rgba(129,140,248,.8)}
+
+  .chip{
+    border:1px solid var(--line);background:rgba(255,255,255,.03);
+    transition:all .25s ease;white-space:nowrap;
+  }
+  .chip:hover{border-color:rgba(255,255,255,.28);color:#fff}
+  .chip.active{
+    background:linear-gradient(100deg,rgba(79,70,229,.9),rgba(168,85,247,.9));
+    border-color:transparent;color:#fff;box-shadow:0 12px 30px -14px rgba(124,58,237,.95)
+  }
+
+  /* ---------- Flashcard 3D ---------- */
+  .card3d{perspective:1400px}
+  .card-inner{
+    position:absolute;inset:0;
+    transform-style:preserve-3d;
+    transition:transform .65s cubic-bezier(.3,.8,.25,1);
+  }
+  .card3d.flipped .card-inner{transform:rotateY(180deg)}
+  .card-face{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    border-radius:24px;padding:28px;text-align:center;
+  }
+  .card-back{transform:rotateY(180deg)}
+
+  /* ---------- Modal ---------- */
+  .modal{position:fixed;inset:0;z-index:80;display:none}
+  .modal.open{display:block}
+  .modal-bd{position:absolute;inset:0;background:rgba(3,4,12,.75);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);animation:fade .3s ease both}
+  .modal-panel{
+    position:relative;margin:auto;max-width:660px;width:calc(100% - 28px);
+    max-height:88vh;overflow-y:auto;border-radius:26px;
+    animation:pop .4s cubic-bezier(.2,.8,.25,1) both;
+  }
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes pop{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+  .modal-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px}
+
+  /* ---------- Misc ---------- */
+  .progress-bar{transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .nav-link{position:relative}
+  .nav-link::after{
+    content:'';position:absolute;left:0;bottom:-6px;height:2px;width:0;
+    background:linear-gradient(90deg,#818cf8,#22d3ee);transition:width .3s ease;
+  }
+  .nav-link:hover::after{width:100%}
+  .script-font{font-family:"Noto Sans","Segoe UI","Apple Color Emoji",system-ui,sans-serif}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body class="relative">
+
+<!-- ================= AURORA ================= -->
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<!-- ================= NAV ================= -->
+<header id="nav" class="fixed top-0 inset-x-0 z-50 transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div id="navInner" class="mt-3 flex items-center justify-between rounded-2xl px-4 sm:px-5 py-3 transition-all duration-300">
+      <a href="#top" class="flex items-center gap-3 group">
+        <span class="relative grid place-items-center w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-cyan-400 shadow-glow">
+          <svg viewBox="0 0 24 24" class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 3 2.6 15 0 18M12 3c-2.6 3-2.6 15 0 18"/>
+          </svg>
+        </span>
+        <span class="leading-none">
+          <span class="block text-[17px] font-extrabold tracking-tight">Linguaverse</span>
+          <span class="block text-[10px] uppercase tracking-[0.18em] text-white/40 mt-0.5">Every language · One place</span>
+        </span>
+      </a>
+
+      <nav class="hidden lg:flex items-center gap-8 text-sm text-white/70 font-medium">
+        <a class="nav-link hover:text-white transition" href="#explorer">Languages</a>
+        <a class="nav-link hover:text-white transition" href="#method">Method</a>
+        <a class="nav-link hover:text-white transition" href="#practice">Practice</a>
+        <a class="nav-link hover:text-white transition" href="#pricing">Pricing</a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <a href="#explorer" class="hidden sm:inline-flex btn-ghost text-sm font-semibold px-4 py-2.5 rounded-xl border border-white/10 text-white/80">Sign in</a>
+        <a href="#practice" class="btn-primary text-sm font-bold px-4 sm:px-5 py-2.5 rounded-xl text-white">Start free</a>
+        <button id="burger" aria-label="Menu" class="lg:hidden grid place-items-center w-10 h-10 rounded-xl border border-white/10 text-white/80">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="mobileMenu" class="lg:hidden hidden px-4 sm:px-6">
+    <div class="glass rounded-2xl mt-2 p-3 flex flex-col text-sm font-medium">
+      <a class="px-4 py-3 rounded-xl hover:bg-white/5" href="#explorer">Languages</a>
+      <a class="px-4 py-3 rounded-xl hover:bg-white/5" href="#method">Method</a>
+      <a class="px-4 py-3 rounded-xl hover:bg-white/5" href="#practice">Practice</a>
+      <a class="px-4 py-3 rounded-xl hover:bg-white/5" href="#pricing">Pricing</a>
+    </div>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<main id="top" class="relative z-10">
+<section class="pt-32 sm:pt-40 pb-16 sm:pb-24 px-4 sm:px-6">
+  <div class="max-w-7xl mx-auto grid lg:grid-cols-[1.05fr_.95fr] gap-14 lg:gap-8 items-center">
+
+    <div class="reveal">
+      <div class="inline-flex items-center gap-2 glass rounded-full pl-2 pr-4 py-1.5 text-xs font-semibold text-white/70">
+        <span class="grid place-items-center w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-400 text-[11px]">🌍</span>
+        7,168 living languages · 60+ full courses
+      </div>
+
+      <h1 class="mt-6 text-[40px] leading-[1.05] sm:text-6xl lg:text-[68px] font-extrabold tracking-tight">
+        Learn <span class="grad-text">every language</span> on Earth.
+      </h1>
+
+      <p class="mt-6 text-base sm:text-lg text-white/60 max-w-xl leading-relaxed">
+        From Spanish to Sinhala, Navajo to Nepali. Linguaverse pairs native-speaker audio, adaptive spaced repetition and living conversation practice — so any script becomes second nature.
+      </p>
+
+      <!-- Search -->
+      <div class="mt-8 relative max-w-xl">
+        <div class="glass rounded-2xl flex items-center gap-3 px-4 py-3 focus-within:border-fuchsia-400/50 transition">
+          <svg viewBox="0 0 24 24" class="w-5 h-5 text-white/40 shrink-0" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="heroSearch" autocomplete="off" placeholder="Try “Japanese”, “Yoruba” or “Devanagari”…"
+            class="bg-transparent outline-none w-full text-[15px] placeholder:text-white/35" />
+          <kbd class="hidden sm:block text-[10px] text-white/35 border border-white/15 rounded-md px-2 py-1">⌘K</kbd>
+        </div>
+        <div id="heroResults" class="hidden absolute left-0 right-0 top-[calc(100%+10px)] glass rounded-2xl p-2 z-30 shadow-soft"></div>
+      </div>
+
+      <div class="mt-7 flex flex-wrap items-center gap-3">
+        <a href="#practice" class="btn-primary inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-white">
+          Start learning free
+          <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#explorer" class="btn-ghost inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-white/85 border border-white/12">
+          Browse all languages
+        </a>
+      </div>
+
+      <div class="mt-9 flex items-center gap-4">
+        <div class="flex -space-x-2.5">
+          <span class="w-9 h-9 rounded-full border-2 border-ink bg-gradient-to-br from-indigo-500 to-purple-600 grid place-items-center text-xs font-bold">AK</span>
+          <span class="w-9 h-9 rounded-full border-2 border-ink bg-gradient-to-br from-cyan-400 to-blue-600 grid place-items-center text-xs font-bold">MJ</span>
+          <span class="w-9 h-9 rounded-full border-2 border-ink bg-gradient-to-br from-fuchsia-500 to-rose-500 grid place-items-center text-xs font-bold">LB</span>
+          <span class="w-9 h-9 rounded-full border-2 border-ink bg-white/10 grid place-items-center text-[11px] font-bold">+2M</span>
+        </div>
+        <p class="text-sm text-white/50 leading-tight">
+          <span class="text-white/85 font-semibold">2.4M learners</span><br class="hidden sm:block">
+          across 190 countries
+        </p>
+      </div>
+    </div>
+
+    <!-- Globe -->
+    <div class="reveal relative">
+      <div class="relative aspect-square max-w-[540px] mx-auto">
+        <div class="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_45%,rgba(99,102,241,.30),transparent_62%)] blur-2xl"></div>
+        <canvas id="globeCanvas" class="relative w-full h-full"></canvas>
+
+        <div class="absolute top-[8%] left-[2%] glass rounded-2xl px-4 py-3 shadow-soft float-slow">
+          <p class="text-[10px] uppercase tracking-widest text-white/45">Now learning</p>
+          <p class="text-sm font-bold mt-0.5">こんにちは · Japanese</p>
+        </div>
+        <div class="absolute bottom-[12%] right-[0%] glass rounded-2xl px-4 py-3 shadow-soft float-slower">
+          <p class="text-[10px] uppercase tracking-widest text-white/45">Daily streak</p>
+          <p class="text-sm font-bold mt-0.5">🔥 128 days</p>
+        </div>
+        <div class="absolute bottom-[38%] left-[-2%] glass rounded-2xl px-4 py-3 shadow-soft float-slow">
+          <p class="text-[10px] uppercase tracking-widest text-white/45">Script mastery</p>
+          <p class="text-sm font-bold mt-0.5">Devanagari 94%</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .float-slow{animation:floaty 7s ease-in-out infinite}
+  .float-slower{animation:floaty 9s ease-in-out infinite reverse}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+</style>
+
+<!-- ================= MARQUEE ================= -->
+<section class="relative border-y border-white/[0.07] bg-white/[0.015] py-5 overflow-hidden">
+  <div class="marquee" id="marquee"></div>
+  <div class="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-ink to-transparent"></div>
+  <div class="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-ink to-transparent"></div>
+</section>
+
+<!-- ================= STATS ================= -->
+<section class="py-16 sm:py-20 px-4 sm:px-6">
+  <div class="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+    <div class="reveal glass rounded-3xl p-6 sm:p-7">
+      <p class="text-3xl sm:text-4xl font-extrabold grad-text" data-count="7168">0</p>
+      <p class="mt-2 text-sm text-white/55">Living languages catalogued</p>
+    </div>
+    <div class="reveal glass rounded-3xl p-6 sm:p-7">
+      <p class="text-3xl sm:text-4xl font-extrabold grad-text" data-count="2400000" data-suffix="+">0</p>
+      <p class="mt-2 text-sm text-white/55">Active learners worldwide</p>
+    </div>
+    <div class="reveal glass rounded-3xl p-6 sm:p-7">
+      <p class="text-3xl sm:text-4xl font-extrabold grad-text" data-count="96" data-suffix="%">0</p>
+      <p class="mt-2 text-sm text-white/55">Learners hit their weekly goal</p>
+    </div>
+    <div class="reveal glass rounded-3xl p-6 sm:p-7">
+      <p class="text-3xl sm:text-4xl font-extrabold grad-text" data-count="190">0</p>
+      <p class="mt-2 text-sm text-white/55">Countries with native tutors</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EXPLORER ================= -->
+<section id="explorer" class="py-16 sm:py-24 px-4 sm:px-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="reveal flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[0.22em] text-fuchsia-300/80">The atlas</p>
+        <h2 class="mt-3 text-3xl sm:text-5xl font-extrabold tracking-tight">Explore the world's languages</h2>
+        <p class="mt-4 text-white/55 max-w-2xl leading-relaxed">
+          Filter by region, search by script or family, then tap any language to hear real pronunciation and try a mini-lesson.
+        </p>
+      </div>
+      <div class="glass rounded-2xl px-5 py-4 shrink-0">
+        <p class="text-[10px] uppercase tracking-widest text-white/45">Showing</p>
+        <p class="text-2xl font-extrabold"><span id="shownCount">0</span><span class="text-white/40 text-base font-semibold"> languages</span></p>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="reveal mt-10 flex flex-col gap-4">
+      <div class="glass rounded-2xl flex items-center gap-3 px-4 py-3">
+        <svg viewBox="0 0 24 24" class="w-5 h-5 text-white/40 shrink-0" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="explorerSearch" autocomplete="off" placeholder="Search 60+ languages, scripts or families…"
+          class="bg-transparent outline-none w-full text-[15px] placeholder:text-white/35" />
+        <button id="randomBtn" class="hidden sm:inline-flex items-center gap-2 shrink-0 text-xs font-bold px-3.5 py-2 rounded-xl bg-white/[0.06] border border-white/10 hover:bg-white/12 transition">
+          🎲 Surprise me
+        </button>
+      </div>
+
+      <div class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1" id="regionChips"></div>
+    </div>
+
+    <!-- Grid -->
+    <div id="langGrid" class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5"></div>
+    <p id="emptyState" class="hidden text-center text-white/45 py-20">No languages match that search — try another spelling or clear the filters.</p>
+  </div>
+</section>
+
+<!-- ================= METHOD ================= -->
+<section id="method" class="py-16 sm:py-24 px-4 sm:px-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="reveal max-w-3xl">
+      <p class="text-xs font-bold uppercase tracking-[0.22em] text-cyan-300/80">The method</p>
+      <h2 class="mt-3 text-3xl sm:text-5xl font-extrabold tracking-tight">Built for languages the other apps ignore</h2>
+      <p class="mt-4 text-white/55 leading-relaxed">
+        Most courses stop at the top 20 languages. Our engine was designed from day one for thousands of scripts, tone systems and grammar families.
+      </p>
+    </div>
+
+    <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <article class="reveal lang-card rounded-3xl p-6">
+        <div class="w-12 h-12 rounded-2xl grid place-items-center bg-gradient-to-br from-indigo-500 to-indigo-700 shadow-glow">
+          <svg viewBox="0 0 24 24" class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3v18M5 8l7-5 7 5"/><path d="M5 8v8l7 5 7-5V8"/></svg>
+        </div>
+        <h3 class="mt-5 font-bold text-lg">Script-first design</h3>
+        <p class="mt-2 text-sm text-white/55 leading-relaxed">Stroke-by-stroke training for every writing system — Hanzi, Devanagari, Ethiopic, Hangul and 40 more.</p>
+      </article>
+
+      <article class="reveal lang-card rounded-3xl p-6">
+        <div class="w-12 h-12 rounded-2xl grid place-items-center bg-gradient-to-br from-fuchsia-500 to-purple-700 shadow-glow">
+          <svg viewBox="0 0 24 24" class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 21a9 9 0 1 0-9-9"/><path d="M12 7v5l3 2"/><path d="M3 17l2.5-1.5"/></svg>
+        </div>
+        <h3 class="mt-5 font-bold text-lg">Adaptive recall</h3>
+        <p class="mt-2 text-sm text-white/55 leading-relaxed">Our scheduler predicts the exact moment you're about to forget a word and resurfaces it before you do.</p>
+      </article>
+
+      <article class="reveal lang-card rounded-3xl p-6">
+        <div class="w-12 h-12 rounded-2xl grid place-items-center bg-gradient-to-br from-cyan-400 to-blue-600 shadow-glow">
+          <svg viewBox="0 0 24 24" class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3a4 4 0 0 1 4 4v5a4 4 0 0 1-8 0V7a4 4 0 0 1 4-4Z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+        </div>
+        <h3 class="mt-5 font-bold text-lg">Native audio clips</h3>
+        <p class="mt-2 text-sm text-white/55 leading-relaxed">Over 1.2 million recordings from native speakers — including endangered languages with few fluent voices left.</p>
+      </article>
+
+      <article class="reveal lang-card rounded-3xl p-6">
+        <div class="w-12 h-12 rounded-2xl grid place-items-center bg-gradient-to-br from-emerald-400 to-teal-600 shadow-glow">
+          <svg viewBox="0 0 24 24" class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M17 8a5 5 0 0 0-10 0v1a4 4 0 0 0-1 7.9V19h12v-2.1A4 4 0 0 0 17 9V8Z"/><path d="M9 12h6"/></svg>
+        </div>
+        <h3 class="mt-5 font-bold text-lg">Live conversation</h3>
+        <p class="mt-2 text-sm text-white/55 leading-relaxed">Match with tutors and learners in 190 countries for 15-minute guided speaking sprints, any hour.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRACTICE ================= -->
+<section id="practice" class="py-16 sm:py-24 px-4 sm:px-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="reveal text-center max-w-2xl mx-auto">
+      <p class="text-xs font-bold uppercase tracking-[0.22em] text-indigo-300/80">Try it now</p>
+      <h2 class="mt-3 text-3xl sm:text-5xl font-extrabold tracking-tight">A 4-card taste of any language</h2>
+      <p class="mt-4 text-white/55 leading-relaxed">Pick a language, flip the cards, and hear how it sounds. No sign-up needed.</p>
+    </div>
+
+    <div class="reveal mt-12 max-w-3xl mx-auto">
+      <div class="glass rounded-[28px] p-5 sm:p-8">
+
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <label for="practiceLang" class="text-xs uppercase tracking-widest text-white/45 font-bold">Language</label>
+            <select id="practiceLang"
+              class="bg-white/[0.06] border border-white/12 rounded-xl px-3 py-2 text-sm font-semibold outline-none focus:border-fuchsia-400/60 transition max-w-[210px]"></select>
+          </div>
+          <div class="flex items-center gap-3 text-sm">
+            <span class="text-white/45">Score</span>
+            <span id="scoreVal" class="font-extrabold text-lg grad-text">0</span>
+          </div>
+        </div>
+
+        <div class="mt-6 h-1.5 rounded-full bg-white/8 overflow-hidden">
+          <div id="progressBar" class="progress-bar h-full w-0 rounded-full bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-cyan-400"></div>
+        </div>
+        <div class="mt-2 flex justify-between text-[11px] text-white/40 font-semibold uppercase tracking-wider">
+          <span id="cardCounter">Card 1 of 4</span>
+          <span id="accuracyLabel">Accuracy —</span>
+        </div>
+
+        <div id="card3d" class="card3d relative mt-6 h-[300px] sm:h-[330px] cursor-pointer select-none">
+          <div class="card-inner">
+            <div class="card-face glass border border-white/10">
+              <p id="frontLang" class="text-[10px] uppercase tracking-[0.22em] text-white/40 font-bold">Spanish</p>
+              <p id="frontText" class="script-font mt-4 text-3xl sm:text-4xl font-extrabold leading-tight px-2">Hola</p>
+              <p id="frontSub" class="mt-3 text-sm text-white/40"></p>
+              <p class="mt-6 text-[11px] uppercase tracking-widest text-white/30 font-bold">Tap card to reveal</p>
+            </div>
+            <div class="card-face card-back border border-fuchsia-400/25" style="background:linear-gradient(160deg,rgba(168,85,247,.20),rgba(34,211,238,.10))">
+              <p id="backLang" class="text-[10px] uppercase tracking-[0.22em] text-white/45 font-bold">Answer</p>
+              <p id="backText" class="script-font mt-4 text-3xl sm:text-4xl font-extrabold leading-tight px-2">Hello</p>
+              <p id="backSub" class="mt-3 text-sm text-white/50"></p>
+              <button id="speakBtn" class="mt-6 inline-flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-xl bg-white/10 border border-white/15 hover:bg-white/18 transition">
+                <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>
+                Hear it
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="practiceActions" class="mt-6 flex flex-col sm:flex-row gap-3">
+          <button id="flipBtn" class="btn-primary flex-1 py-3.5 rounded-xl font-bold text-white">Show answer</button>
+          <button id="againBtn" class="hidden flex-1 py-3.5 rounded-xl font-bold border border-white/12 hover:bg-white/6 transition">Review again</button>
+          <button id="gotBtn" class="hidden flex-1 py-3.5 rounded-xl font-bold text-white" style="background:linear-gradient(100deg,#059669,#0891b2)">I knew it</button>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="hidden text-center py-6">
+          <div class="mx-auto w-20 h-20 rounded-full grid place-items-center bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-cyan-400 shadow-glow">
+            <span class="text-3xl" id="resultsEmoji">🎉</span>
+          </div>
+          <h3 class="mt-5 text-2xl font-extrabold" id="resultsTitle">Great work!</h3>
+          <p class="mt-2 text-white/55" id="resultsText">You recalled 3 of 4 phrases.</p>
+          <button id="restartBtn" class="btn-primary mt-6 px-7 py-3.5 rounded-xl font-bold text-white">Practice again</button>
+        </div>
+
+      </div>
+      <p class="mt-4 text-center text-xs text-white/35">Audio uses your device's built-in speech engine — quality varies by language and browser.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TESTIMONIALS ================= -->
+<section class="py-16 sm:py-24 px-4 sm:px-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="reveal max-w-2xl">
+      <p class="text-xs font-bold uppercase tracking-[0.22em] text-fuchsia-300/80">Learner stories</p>
+      <h2 class="mt-3 text-3xl sm:text-5xl font-extrabold tracking-tight">Fluent, one script at a time</h2>
+    </div>
+
+    <div class="mt-12 grid md:grid-cols-3 gap-5">
+      <figure class="reveal lang-card rounded-3xl p-7 flex flex-col">
+        <div class="flex gap-1 text-amber-300 text-sm">★★★★★</div>
+        <blockquote class="mt-4 text-white/75 leading-relaxed text-[15px]">"I'd given up on Georgian twice. The stroke trainer and the 15-minute tutor sprints finally made the alphabet click — I read my first Georgian menu last month."</blockquote>
+        <figcaption class="mt-6 flex items-center gap-3 pt-5 border-t border-white/8">
+          <span class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-600 grid place-items-center font-bold text-sm">ER</span>
+          <span><span class="block text-sm font-bold">Elena R.</span><span class="block text-xs text-white/45">Polish → Georgian</span></span>
+        </figcaption>
+      </figure>
+
+      <figure class="reveal lang-card rounded-3xl p-7 flex flex-col">
+        <div class="flex gap-1 text-amber-300 text-sm">★★★★★</div>
+        <blockquote class="mt-4 text-white/75 leading-relaxed text-[15px]">"My grandmother speaks Yoruba and I never could. Hearing real native audio on every card and practising tones daily has changed family dinners entirely."</blockquote>
+        <figcaption class="mt-6 flex items-center gap-3 pt-5 border-t border-white/8">
+          <span class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 grid place-items-center font-bold text-sm">TA</span>
+          <span><span class="block text-sm font-bold">Tunde A.</span><span class="block text-xs text-white/45">English → Yoruba</span></span>
+        </figcaption>
+      </figure>
+
+      <figure class="reveal lang-card rounded-3xl p-7 flex flex-col">
+        <div class="flex gap-1 text-amber-300 text-sm">★★★★★</div>
+        <blockquote class="mt-4 text-white/75 leading-relaxed text-[15px]">"I study endangered languages in the field. Linguaverse is the only mainstream app that treats small languages as first-class citizens, not novelties."</blockquote>
+        <figcaption class="mt-6 flex items-center gap-3 pt-5 border-t border-white/8">
+          <span class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 grid place-items-center font-bold text-sm">MS</span>
+          <span><span class="block text-sm font-bold">Dr. Marta Silva</span><span class="block text-xs text-white/45">Linguistic anthropologist</span></span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRICING ================= -->
+<section id="pricing" class="py-16 sm:py-24 px-4 sm:px-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="reveal text-center max-w-2xl mx-auto">
+      <p class="text-xs font-bold uppercase tracking-[0.22em] text-cyan-300/80">Plans</p>
+      <h2 class="mt-3 text-3xl sm:text-5xl font-extrabold tracking-tight">Start free. Go further when you're ready.</h2>
+      <p class="mt-4 text-white/55 leading-relaxed">Every plan includes the full language atlas — 7,168 languages, zero paywalls on discovery.</p>
+    </div>
+
+    <div class="mt-12 grid lg:grid-cols-3 gap-5 items-stretch">
+      <div class="reveal lang-card rounded-3xl p-7 flex flex-col">
+        <h3 class="font-extrabold text-lg">Explorer</h3>
+        <p class="mt-1 text-sm text-white/50">For the curious traveller</p>
+        <p class="mt-6 text-4xl font-extrabold">$0<span class="text-base font-semibold text-white/40">/forever</span></p>
+        <ul class="mt-6 space-y-3 text-sm text-white/65 flex-1">
+          <li class="flex gap-3"><span class="text-cyan-300">✓</span> 1 active language course</li>
+          <li class="flex gap-3"><span class="text-cyan-300">✓</span> Full language atlas & audio samples</li>
+          <li class="flex gap-3"><span class="text-cyan-300">✓</span> Daily streak & spaced repetition</li>
+          <li class="flex gap-3"><span class="text-cyan-300">✓</span> Community forums</li>
+        </ul>
+        <a href="#practice" class="btn-ghost mt-7 text-center py-3.5 rounded-xl font-bold border border-white/12">Create free account</a>
+      </div>
+
+      <div class="reveal lang-card rounded-3xl p-7 flex flex-col relative" style="border-color:rgba(168,85,247,.55);box-shadow:0 34px 70px -40px rgba(168,85,247,1)">
+        <span class="absolute -top-3 left-7 text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500">Most popular</span>
+        <h3 class="font-extrabold text-lg">Polyglot Pro</h3>
+        <p class="mt-1 text-sm text-white/50">For serious multi-language learners</p>
+        <p class="mt-6 text-4xl font-extrabold">$12<span class="text-base font-semibold text-white/40">/month</span></p>
+        <ul class="mt-6 space-y-3 text-sm text-white/70 flex-1">
+          <li class="flex gap-3"><span class="text-fuchsia-300">✓</span> <span><b class="text-white">Unlimited</b> language courses</span></li>
+          <li class="flex gap-3"><span class="text-fuchsia-300">✓</span> Script & stroke mastery trainer</li>
+          <li class="flex gap-3"><span class="text-fuchsia-300">✓</span> Offline lessons & 1.2M audio clips</li>
+          <li class="flex gap-3"><span class="text-fuchsia-300">✓</span> 4 live tutor sprints / month</li>
+          <li class="flex gap-3"><span class="text-fuchsia-300">✓</span> Pronunciation feedback AI</li>
+        </ul>
+        <a href="#practice" class="btn-primary mt-7 text-center py-3.5 rounded-xl font-bold text-white">Start 14-day free trial</a>
+      </div>
+
+      <div class="reveal lang-card rounded-3xl p-7 flex flex-col">
+        <h3 class="font-extrabold text-lg">Institute</h3>
+        <p class="mt-1 text-sm text-white/50">For schools, teams & researchers</p>
+        <p class="mt-6 text-4xl font-extrabold">$39<span class="text-base font-semibold text-white/40">/month</span></p>
+        <ul class="mt-6 space-y-3 text-sm text-white/65 flex-1">
+          <li class="flex gap-3"><span class="text-emerald-300">✓</span> Everything in Polyglot Pro</li>
+          <li class="flex gap-3"><span class="text-emerald-300">✓</span> Up to 25 seats & admin dashboard</li>
+          <li class="flex gap-3"><span class="text-emerald-300">✓</span> Curriculum builder & cohort tracking</li>
+          <li class="flex gap-3"><span class="text-emerald-300">✓</span> Field-recording & lexicon tools</li>
+        </ul>
+        <a href="#practice" class="btn-ghost mt-7 text-center py-3.5 rounded-xl font-bold border border-white/12">Talk to our team</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="py-16 sm:py-24 px-4 sm:px-6">
+  <div class="reveal max-w-6xl mx-auto relative overflow-hidden rounded-[32px] border border-white/10 px-6 sm:px-14 py-14 sm:py-20 text-center"
+       style="background:linear-gradient(140deg,rgba(79,70,229,.35),rgba(168,85,247,.22) 45%,rgba(34,211,238,.18))">
+    <div class="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-fuchsia-500/30 blur-3xl"></div>
+    <div class="absolute -bottom-24 -left-16 w-72 h-72 rounded-full bg-cyan-400/25 blur-3xl"></div>
+    <div class="relative">
+      <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight max-w-3xl mx-auto leading-tight">There are 7,000 reasons to start today. Pick one.</h2>
+      <p class="mt-5 text-white/65 max-w-xl mx-auto">Free forever for your first language. No credit card, no commitment — just five minutes a day.</p>
+      <div class="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="#explorer" class="btn-primary px-8 py-4 rounded-xl font-bold text-white">Choose your language</a>
+        <a href="#method" class="btn-ghost px-8 py-4 rounded-xl font-bold border border-white/20 text-white/90">See how it works</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="relative border-t border-white/[0.07] pt-16 pb-10 px-4 sm:px-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid md:grid-cols-[1.4fr_1fr_1fr_1fr] gap-10">
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="grid place-items-center w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-cyan-400">
+            <svg viewBox="0 0 24 24" class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 3 2.6 15 0 18M12 3c-2.6 3-2.6 15 0 18"/></svg>
+          </span>
+          <span class="font-extrabold tracking-tight">Linguaverse</span>
+        </div>
+        <p class="mt-5 text-sm text-white/50 leading-relaxed max-w-xs">Building the world's most complete language atlas — and the tools to actually learn from it.</p>
+        <form id="newsletter" class="mt-6 flex gap-2 max-w-sm">
+          <input type="email" required placeholder="you@example.com"
+            class="flex-1 bg-white/[0.05] border border-white/12 rounded-xl px-4 py-3 text-sm outline-none focus:border-fuchsia-400/60 transition placeholder:text-white/30" />
+          <button class="btn-primary px-4 py-3 rounded-xl font-bold text-sm text-white shrink-0">Join</button>
+        </form>
+        <p id="newsletterMsg" class="mt-2 text-xs text-emerald-300 hidden">Thanks! Check your inbox for a welcome lesson. 🌍</p>
+      </div>
+
+      <div>
+        <h4 class="text-xs font-extrabold uppercase tracking-widest text-white/40">Learn</h4>
+        <ul class="mt-5 space-y-3 text-sm text-white/60">
+          <li><a href="#explorer" class="hover:text-white transition">All languages</a></li>
+          <li><a href="#explorer" class="hover:text-white transition">Script trainer</a></li>
+          <li><a href="#practice" class="hover:text-white transition">Daily drill</a></li>
+          <li><a href="#practice" class="hover:text-white transition">Live tutors</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-xs font-extrabold uppercase tracking-widest text-white/40">Company</h4>
+        <ul class="mt-5 space-y-3 text-sm text-white/60">
+          <li><a href="#method" class="hover:text-white transition">Our method</a></li>
+          <li><a href="#pricing" class="hover:text-white transition">Pricing</a></li>
+          <li><a href="#top" class="hover:text-white transition">Careers</a></li>
+          <li><a href="#top" class="hover:text-white transition">Press kit</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-xs font-extrabold uppercase tracking-widest text-white/40">Resources</h4>
+        <ul class="mt-5 space-y-3 text-sm text-white/60">
+          <li><a href="#top" class="hover:text-white transition">Endangered languages</a></li>
+          <li><a href="#top" class="hover:text-white transition">Linguistics blog</a></li>
+          <li><a href="#top" class="hover:text-white transition">For educators</a></li>
+          <li><a href="#top" class="hover:text-white transition">Help centre</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-14 pt-7 border-t border-white/[0.07] flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-xs text-white/40">© <span id="year"></span> Linguaverse Labs. Made for every voice on Earth.</p>
+      <div class="flex gap-5 text-xs text-white/45">
+        <a href="#top" class="hover:text-white transition">Privacy</a>
+        <a href="#top" class="hover:text-white transition">Terms</a>
+        <a href="#top" class="hover:text-white transition">Accessibility</a>
+      </div>
+    </div>
+  </div>
+</footer>
+</main>
+
+<!-- ================= MODAL ================= -->
+<div id="modal" class="modal" role="dialog" aria-modal="true">
+  <div class="modal-bd" data-close></div>
+  <div class="modal-wrap">
+    <div class="modal-panel glass" id="modalPanel"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DATA — 60 languages across every inhabited continent
+   p: [english, native, romanization]
+   d: difficulty 1 (easy) → 5 (very hard)
+   ============================================================ */
+const LANGS = [
+  {n:"Mandarin",na:"中文",s:"Han",f:"Sino-Tibetan",r:"Asia",sp:1140,d:5,lc:"zh-CN",p:[["Hello","你好","Nǐ hǎo"],["Thank you","谢谢","Xièxie"],["Goodbye","再见","Zàijiàn"],["Friend","朋友","Péngyou"]]},
+  {n:"Spanish",na:"Español",s:"Latin",f:"Indo-European",r:"Europe",sp:559,d:1,lc:"es-ES",p:[["Hello","Hola",""],["Thank you","Gracias",""],["Goodbye","Adiós",""],["Friend","Amigo",""]]},
+  {n:"English",na:"English",s:"Latin",f:"Indo-European",r:"Global",sp:1500,d:1,lc:"en-US",p:[["Hello","Hello",""],["Thank you","Thank you",""],["Goodbye","Goodbye",""],["Friend","Friend",""]]},
+  {n:"Hindi",na:"हिन्दी",s:"Devanagari",f:"Indo-European",r:"Asia",sp:610,d:3,lc:"hi-IN",p:[["Hello","नमस्ते","Namaste"],["Thank you","धन्यवाद","Dhanyavaad"],["Goodbye","अलविदा","Alvida"],["Friend","दोस्त","Dost"]]},
+  {n:"Arabic",na:"العربية",s:"Arabic",f:"Afro-Asiatic",r:"Middle East",sp:274,d:4,lc:"ar-SA",p:[["Hello","مرحبا","Marhaba"],["Thank you","شكرا","Shukran"],["Goodbye","مع السلامة","Maʿa as-salama"],["Peace","سلام","Salaam"]]},
+  {n:"French",na:"Français",s:"Latin",f:"Indo-European",r:"Europe",sp:274,d:1,lc:"fr-FR",p:[["Hello","Bonjour",""],["Thank you","Merci",""],["Goodbye","Au revoir",""],["Friend","Ami",""]]},
+  {n:"Bengali",na:"বাংলা",s:"Bengali",f:"Indo-European",r:"Asia",sp:272,d:3,lc:"bn-BD",p:[["Hello","নমস্কার","Nomoskar"],["Thank you","ধন্যবাদ","Dhonnobad"],["Goodbye","বিদায়","Biday"],["Friend","বন্ধু","Bondhu"]]},
+  {n:"Portuguese",na:"Português",s:"Latin",f:"Indo-European",r:"Europe",sp:264,d:1,lc:"pt-BR",p:[["Hello","Olá",""],["Thank you","Obrigado",""],["Goodbye","Tchau",""],["Friend","Amigo",""]]},
+  {n:"Russian",na:"Русский",s:"Cyrillic",f:"Indo-European",r:"Europe",sp:255,d:3,lc:"ru-RU",p:[["Hello","Привет","Privet"],["Thank you","Спасибо","Spasibo"],["Goodbye","Пока","Poka"],["Friend","Друг","Drug"]]},
+  {n:"Urdu",na:"اردو",s:"Arabic",f:"Indo-European",r:"Asia",sp:230,d:4,lc:"ur-PK",p:[["Hello","السلام علیکم","Assalam-o-alaikum"],["Thank you","شکریہ","Shukriya"],["Goodbye","خدا حافظ","Khuda hafiz"],["Friend","دوست","Dost"]]},
+  {n:"Swahili",na:"Kiswahili",s:"Latin",f:"Niger-Congo",r:"Africa",sp:200,d:2,lc:"sw-KE",p:[["Hello","Habari",""],["Thank you","Asante",""],["Goodbye","Kwaheri",""],["Friend","Rafiki",""]]},
+  {n:"Indonesian",na:"Bahasa Indonesia",s:"Latin",f:"Austronesian",r:"Asia",sp:199,d:2,lc:"id-ID",p:[["Hello","Halo",""],["Thank you","Terima kasih",""],["Goodbye","Selamat tinggal",""],["Friend","Teman",""]]},
+  {n:"German",na:"Deutsch",s:"Latin",f:"Indo-European",r:"Europe",sp:134,d:2,lc:"de-DE",p:[["Hello","Hallo",""],["Thank you","Danke",""],["Goodbye","Tschüss",""],["Friend","Freund",""]]},
+  {n:"Japanese",na:"日本語",s:"Kana & Kanji",f:"Japonic",r:"Asia",sp:125,d:5,lc:"ja-JP",p:[["Hello","こんにちは","Konnichiwa"],["Thank you","ありがとう","Arigatō"],["Goodbye","さようなら","Sayōnara"],["Friend","友達","Tomodachi"]]},
+  {n:"Punjabi",na:"ਪੰਜਾਬੀ",s:"Gurmukhi",f:"Indo-European",r:"Asia",sp:113,d:4,lc:"pa-IN",p:[["Hello","ਸਤ ਸ੍ਰੀ ਅਕਾਲ","Sat Sri Akal"],["Thank you","ਧੰਨਵਾਦ","Dhannvaad"],["Goodbye","ਅਲਵਿਦਾ","Alvida"],["Friend","ਦੋਸਤ","Dost"]]},
+  {n:"Telugu",na:"తెలుగు",s:"Telugu",f:"Dravidian",r:"Asia",sp:96,d:5,lc:"te-IN",p:[["Hello","నమస్కారం","Namaskaram"],["Thank you","ధన్యవాదాలు","Dhanyavadalu"],["Goodbye","వీడ్కోలు","Veedkolu"],["Friend","స్నేహితుడు","Snehitudu"]]},
+  {n:"Turkish",na:"Türkçe",s:"Latin",f:"Turkic",r:"Asia",sp:88,d:3,lc:"tr-TR",p:[["Hello","Merhaba",""],["Thank you","Teşekkürler",""],["Goodbye","Hoşça kal",""],["Friend","Arkadaş",""]]},
+  {n:"Tamil",na:"தமிழ்",s:"Tamil",f:"Dravidian",r:"Asia",sp:87,d:5,lc:"ta-IN",p:[["Hello","வணக்கம்","Vanakkam"],["Thank you","நன்றி","Nandri"],["Goodbye","பிரியாவிடை","Piriyavidei"],["Friend","நண்பன்","Nanban"]]},
+  {n:"Vietnamese",na:"Tiếng Việt",s:"Latin",f:"Austroasiatic",r:"Asia",sp:85,d:4,lc:"vi-VN",p:[["Hello","Xin chào",""],["Thank you","Cảm ơn",""],["Goodbye","Tạm biệt",""],["Friend","Bạn",""]]},
+  {n:"Korean",na:"한국어",s:"Hangul",f:"Koreanic",r:"Asia",sp:82,d:4,lc:"ko-KR",p:[["Hello","안녕하세요","Annyeonghaseyo"],["Thank you","감사합니다","Gamsahamnida"],["Goodbye","안녕히 가세요","Annyeonghi gaseyo"],["Friend","친구","Chingu"]]},
+  {n:"Tagalog",na:"Tagalog",s:"Latin",f:"Austronesian",r:"Asia",sp:82,d:2,lc:"fil-PH",p:[["Hello","Kumusta",""],["Thank you","Salamat",""],["Goodbye","Paalam",""],["Friend","Kaibigan",""]]},
+  {n:"Hausa",na:"Hausa",s:"Latin",f:"Afro-Asiatic",r:"Africa",sp:80,d:4,lc:"ha-NG",p:[["Hello","Sannu",""],["Thank you","Na gode",""],["Goodbye","Sai an jima",""],["Friend","Aboki",""]]},
+  {n:"Persian",na:"فارسی",s:"Arabic",f:"Indo-European",r:"Middle East",sp:77,d:4,lc:"fa-IR",p:[["Hello","سلام","Salaam"],["Thank you","ممنون","Mamnun"],["Goodbye","خداحافظ","Khodahafez"],["Friend","دوست","Doost"]]},
+  {n:"Italian",na:"Italiano",s:"Latin",f:"Indo-European",r:"Europe",sp:68,d:1,lc:"it-IT",p:[["Hello","Ciao",""],["Thank you","Grazie",""],["Goodbye","Arrivederci",""],["Friend","Amico",""]]},
+  {n:"Thai",na:"ไทย",s:"Thai",f:"Kra-Dai",r:"Asia",sp:61,d:5,lc:"th-TH",p:[["Hello","สวัสดี","Sawasdee"],["Thank you","ขอบคุณ","Khop khun"],["Goodbye","ลาก่อน","La kon"],["Friend","เพื่อน","Phuean"]]},
+  {n:"Amharic",na:"አማርኛ",s:"Ethiopic",f:"Afro-Asiatic",r:"Africa",sp:57,d:5,lc:"am-ET",p:[["Hello","ሰላም","Selam"],["Thank you","አመሰግናለሁ","Ameseginalehu"],["Goodbye","ደህና ሁን","Dehna hun"],["Friend","ጓደኛ","Gwadagna"]]},
+  {n:"Yoruba",na:"Yorùbá",s:"Latin",f:"Niger-Congo",r:"Africa",sp:45,d:4,lc:"yo-NG",p:[["Hello","Ẹ n lẹ",""],["Thank you","Ẹ ṣé",""],["Goodbye","Ó dàbọ̀",""],["Friend","Ọ̀rẹ́",""]]},
+  {n:"Polish",na:"Polski",s:"Latin",f:"Indo-European",r:"Europe",sp:41,d:3,lc:"pl-PL",p:[["Hello","Cześć",""],["Thank you","Dziękuję",""],["Goodbye","Do widzenia",""],["Friend","Przyjaciel",""]]},
+  {n:"Ukrainian",na:"Українська",s:"Cyrillic",f:"Indo-European",r:"Europe",sp:40,d:3,lc:"uk-UA",p:[["Hello","Привіт","Pryvit"],["Thank you","Дякую","Dyakuyu"],["Goodbye","До побачення","Do pobachennya"],["Friend","Друг","Druh"]]},
+  {n:"Burmese",na:"မြန်မာ",s:"Burmese",f:"Sino-Tibetan",r:"Asia",sp:33,d:5,lc:"my-MM",p:[["Hello","မင်္ဂလာပါ","Mingalaba"],["Thank you","ကျေးဇူးတင်ပါတယ်","Kyay zu tin ba de"],["Goodbye","သွားတော့မယ်","Thwar daw me"],["Friend","သူငယ်ချင်း","Thu ngae chin"]]},
+  {n:"Igbo",na:"Igbo",s:"Latin",f:"Niger-Congo",r:"Africa",sp:31,d:4,lc:"ig-NG",p:[["Hello","Ndeewo",""],["Thank you","Daalụ",""],["Goodbye","Ka ọ dị",""],["Friend","Enyi",""]]},
+  {n:"Zulu",na:"isiZulu",s:"Latin",f:"Niger-Congo",r:"Africa",sp:28,d:3,lc:"zu-ZA",p:[["Hello","Sawubona",""],["Thank you","Ngiyabonga",""],["Goodbye","Hamba kahle",""],["Friend","Umngane",""]]},
+  {n:"Malagasy",na:"Malagasy",s:"Latin",f:"Austronesian",r:"Africa",sp:25,d:4,lc:"mg-MG",p:[["Hello","Salama",""],["Thank you","Misaotra",""],["Goodbye","Veloma",""],["Friend","Namana",""]]},
+  {n:"Dutch",na:"Nederlands",s:"Latin",f:"Indo-European",r:"Europe",sp:24,d:2,lc:"nl-NL",p:[["Hello","Hallo",""],["Thank you","Dank je",""],["Goodbye","Tot ziens",""],["Friend","Vriend",""]]},
+  {n:"Romanian",na:"Română",s:"Latin",f:"Indo-European",r:"Europe",sp:24,d:2,lc:"ro-RO",p:[["Hello","Bună",""],["Thank you","Mulțumesc",""],["Goodbye","La revedere",""],["Friend","Prieten",""]]},
+  {n:"Somali",na:"Soomaali",s:"Latin",f:"Afro-Asiatic",r:"Africa",sp:22,d:4,lc:"so-SO",p:[["Hello","Salaam",""],["Thank you","Mahadsanid",""],["Goodbye","Nabadgelyo",""],["Friend","Saaxiib",""]]},
+  {n:"Khmer",na:"ខ្មែរ",s:"Khmer",f:"Austroasiatic",r:"Asia",sp:17,d:5,lc:"km-KH",p:[["Hello","សួស្តី","Suostei"],["Thank you","អរគុណ","Orkun"],["Goodbye","លាហើយ","Lea haey"],["Friend","មិត្តភក្តិ","Mitpheak"]]},
+  {n:"Nepali",na:"नेपाली",s:"Devanagari",f:"Indo-European",r:"Asia",sp:17,d:4,lc:"ne-NP",p:[["Hello","नमस्ते","Namaste"],["Thank you","धन्यवाद","Dhanyabad"],["Goodbye","बिदा","Bida"],["Friend","साथी","Saathi"]]},
+  {n:"Afrikaans",na:"Afrikaans",s:"Latin",f:"Indo-European",r:"Africa",sp:17,d:2,lc:"af-ZA",p:[["Hello","Hallo",""],["Thank you","Dankie",""],["Goodbye","Totsiens",""],["Friend","Vriend",""]]},
+  {n:"Swedish",na:"Svenska",s:"Latin",f:"Indo-European",r:"Europe",sp:13,d:2,lc:"sv-SE",p:[["Hello","Hej",""],["Thank you","Tack",""],["Goodbye","Hej då",""],["Friend","Vän",""]]},
+  {n:"Hungarian",na:"Magyar",s:"Latin",f:"Uralic",r:"Europe",sp:13,d:4,lc:"hu-HU",p:[["Hello","Szia",""],["Thank you","Köszönöm",""],["Goodbye","Viszlát",""],["Friend","Barát",""]]},
+  {n:"Greek",na:"Ελληνικά",s:"Greek",f:"Indo-European",r:"Europe",sp:13,d:3,lc:"el-GR",p:[["Hello","Γεια σου","Yia sou"],["Thank you","Ευχαριστώ","Efharistó"],["Goodbye","Αντίο","Adío"],["Friend","Φίλος","Fílos"]]},
+  {n:"Kazakh",na:"Қазақша",s:"Cyrillic",f:"Turkic",r:"Asia",sp:13,d:5,lc:"kk-KZ",p:[["Hello","Сәлем","Sälem"],["Thank you","Рақмет","Raqmet"],["Goodbye","Сау бол","Sau bol"],["Friend","Дос","Dos"]]},
+  {n:"Czech",na:"Čeština",s:"Latin",f:"Indo-European",r:"Europe",sp:11,d:3,lc:"cs-CZ",p:[["Hello","Ahoj",""],["Thank you","Děkuji",""],["Goodbye","Na shledanou",""],["Friend","Přítel",""]]},
+  {n:"Catalan",na:"Català",s:"Latin",f:"Indo-European",r:"Europe",sp:10,d:2,lc:"ca-ES",p:[["Hello","Hola",""],["Thank you","Gràcies",""],["Goodbye","Adéu",""],["Friend","Amic",""]]},
+  {n:"Hebrew",na:"עברית",s:"Hebrew",f:"Afro-Asiatic",r:"Middle East",sp:9,d:4,lc:"he-IL",p:[["Hello","שלום","Shalom"],["Thank you","תודה","Toda"],["Goodbye","להתראות","Lehitraot"],["Friend","חבר","Chaver"]]},
+  {n:"Serbian",na:"Српски",s:"Cyrillic",f:"Indo-European",r:"Europe",sp:9,d:3,lc:"sr-RS",p:[["Hello","Здраво","Zdravo"],["Thank you","Хвала","Hvala"],["Goodbye","Довиђења","Doviđenja"],["Friend","Пријатељ","Prijatelj"]]},
+  {n:"Quechua",na:"Runasimi",s:"Latin",f:"Quechuan",r:"Americas",sp:8,d:5,lc:"qu-PE",p:[["Hello","Rimaykullayki",""],["Thank you","Añay",""],["Goodbye","Tupananchiskama",""],["Friend","Masi",""]]},
+  {n:"Armenian",na:"Հայերեն",s:"Armenian",f:"Indo-European",r:"Asia",sp:6,d:5,lc:"hy-AM",p:[["Hello","Բարև","Barev"],["Thank you","Շնորհակալություն","Shnorhakalutyun"],["Goodbye","Ցտեսություն","Tstesutyun"],["Friend","Ընկեր","Ynker"]]},
+  {n:"Finnish",na:"Suomi",s:"Latin",f:"Uralic",r:"Europe",sp:5,d:4,lc:"fi-FI",p:[["Hello","Hei",""],["Thank you","Kiitos",""],["Goodbye","Näkemiin",""],["Friend","Ystävä",""]]},
+  {n:"Mongolian",na:"Монгол",s:"Cyrillic",f:"Mongolic",r:"Asia",sp:5,d:5,lc:"mn-MN",p:[["Hello","Сайн байна уу","Sain baina uu"],["Thank you","Баярлалаа","Bayarlalaa"],["Goodbye","Баяртай","Bayartai"],["Friend","Найз","Naiz"]]},
+  {n:"Georgian",na:"ქართული",s:"Georgian",f:"Kartvelian",r:"Asia",sp:4,d:5,lc:"ka-GE",p:[["Hello","გამარჯობა","Gamarjoba"],["Thank you","მადლობა","Madloba"],["Goodbye","ნახვამდის","Nakhvamdis"],["Friend","მეგობარი","Megobari"]]},
+  {n:"Nahuatl",na:"Nāhuatl",s:"Latin",f:"Uto-Aztecan",r:"Americas",sp:1.7,d:5,lc:"nah",p:[["Hello","Niltze",""],["Thank you","Tlazohcamati",""],["Goodbye","Timoittazqueh",""],["Friend","Icnīuhtli",""]]},
+  {n:"Welsh",na:"Cymraeg",s:"Latin",f:"Indo-European",r:"Europe",sp:0.9,d:4,lc:"cy-GB",p:[["Hello","Helo",""],["Thank you","Diolch",""],["Goodbye","Hwyl fawr",""],["Friend","Ffrind",""]]},
+  {n:"Basque",na:"Euskara",s:"Latin",f:"Isolate",r:"Europe",sp:0.75,d:5,lc:"eu-ES",p:[["Hello","Kaixo",""],["Thank you","Eskerrik asko",""],["Goodbye","Agur",""],["Friend","Lagun",""]]},
+  {n:"Icelandic",na:"Íslenska",s:"Latin",f:"Indo-European",r:"Europe",sp:0.35,d:4,lc:"is-IS",p:[["Hello","Halló",""],["Thank you","Takk",""],["Goodbye","Bless",""],["Friend","Vinur",""]]},
+  {n:"Irish",na:"Gaeilge",s:"Latin",f:"Indo-European",r:"Europe",sp:0.2,d:4,lc:"ga-IE",p:[["Hello","Dia dhuit",""],["Thank you","Go raibh maith agat",""],["Goodbye","Slán",""],["Friend","Cara",""]]},
+  {n:"Māori",na:"Te Reo Māori",s:"Latin",f:"Austronesian",r:"Oceania",sp:0.19,d:4,lc:"mi-NZ",p:[["Hello","Kia ora",""],["Thank you","Kia ora",""],["Goodbye","Haere rā",""],["Friend","Hoa",""]]},
+  {n:"Navajo",na:"Diné Bizaad",s:"Latin",f:"Na-Dené",r:"Americas",sp:0.17,d:5,lc:"nv-US",p:[["Hello","Yá'át'ééh",""],["Thank you","Ahéhee'",""],["Goodbye","Hágoónee'",""],["Friend","Ak'is",""]]},
+  {n:"Hawaiian",na:"ʻŌlelo Hawaiʻi",s:"Latin",f:"Austronesian",r:"Oceania",sp:0.024,d:4,lc:"haw-US",p:[["Hello","Aloha",""],["Thank you","Mahalo",""],["Goodbye","A hui hou",""],["Friend","Hoaloha",""]]}
+];
+
+const REGIONS = ["All","Europe","Asia","Africa","Americas","Middle East","Oceania","Global"];
+const DIFF_LABEL = {1:"Beginner friendly",2:"Moderate",3:"Challenging",4:"Hard",5:"Very hard"};
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $  = (s, c=document) => c.querySelector(s);
+const $$ = (s, c=document) => Array.from(c.querySelectorAll(s));
+
+function fmtSpeakers(m){
+  if (m >= 1000) return (m/1000).toFixed(2).replace(/\.?0+$/,'') + "B";
+  if (m >= 1) return Math.round(m) + "M";
+  return Math.round(m*1000) + "K";
+}
+function diffDots(d){
+  let out = "";
+  for (let i=0;i<5;i++) out += '<i class="dot' + (i<d?' on':'') + '"></i>';
+  return '<span class="inline-flex gap-[3px] items-center">' + out + '</span>';
+}
+function speak(text, lang){
+  if (!("speechSynthesis" in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    if (lang) u.lang = lang;
+    u.rate = 0.85;
+    u.pitch = 1;
+    window.speechSynthesis.speak(u);
+  } catch(e){ /* silent */ }
+}
+
+/* ============================================================
+   MARQUEE
+   ============================================================ */
+(function(){
+  const greetings = ["Hello","Hola","こんにちは","مرحبا","Привет","नमस्ते","你好","안녕하세요","Bonjour","Ciao","سلام","Hallo","Olá","Merhaba","สวัสดี","Xin chào","Jambo","שלום","Γεια σου","Hej","ሰላም","Sawubona","Aloha","Kia ora","Բարև","გამარჯობა","Ahoj","Selamat","Salama","Szia"];
+  const html = greetings.map(g => '<span class="script-font px-6 sm:px-9 text-lg sm:text-xl font-semibold text-white/35 hover:text-white transition-colors duration-300 whitespace-nowrap">' + g + '</span>').join("");
+  $("#marquee").innerHTML = html + html;
+})();
+
+/* ============================================================
+   NAV
+   ============================================================ */
+(function(){
+  const navInner = $("#navInner");
+  function onScroll(){
+    if (window.scrollY > 24){
+      navInner.classList.add("glass","shadow-soft");
+    } else {
+      navInner.classList.remove("glass","shadow-soft");
+    }
+  }
+  onScroll();
+  window.addEventListener("scroll", onScroll, {passive:true});
+
+  $("#burger").addEventListener("click", () => $("#mobileMenu").classList.toggle("hidden"));
+  $$("#mobileMenu a").forEach(a => a.addEventListener("click", () => $("#mobileMenu").classList.add("hidden")));
+})();
+
+/* ============================================================
+   GLOBE (canvas)
+   ============================================================ */
+(function(){
+  const cv = document.getElementById("globeCanvas");
+  if (!cv) return;
+  const ctx = cv.getContext("2d");
+  let W=0,H=0,R=0,DPR=1,cx=0,cy=0;
+  let ry = 0, rx = -0.28, targetRx = -0.28, speed = 0.0032;
+  let running = true, t = 0;
+
+  // Fibonacci sphere point cloud
+  const N = 720, pts = [];
+  for (let i=0;i<N;i++){
+    const y = 1 - (i/(N-1))*2;
+    const rad = Math.sqrt(Math.max(0, 1 - y*y));
+    const th = i * 2.399963229728653;
+    pts.push([Math.cos(th)*rad, y, Math.sin(th)*rad]);
+  }
+
+  // Approximate hubs (lat, lon)
+  const hubs = [[39,-4],[35,105],[20,78],[-12,-47],[51,4],[30,31],[13,100],[40,-100],[-25,28],[60,90],[23,80],[-1,37],[35,51],[21,-157],[32,35],[41,29],[-36,175],[1,103],[9,8],[48,2],[25,121],[52,13],[45,25]];
+
+  function fit(){
+    const r = cv.getBoundingClientRect();
+    if (!r.width) return;
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height;
+    cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    R = Math.min(W,H) * 0.40;
+    cx = W/2; cy = H/2;
+  }
+
+  function rot(x,y,z){
+    const cosY = Math.cos(ry), sinY = Math.sin(ry);
+    const x1 = x*cosY + z*sinY;
+    const z1 = -x*sinY + z*cosY;
+    const cosX = Math.cos(rx), sinX = Math.sin(rx);
+    const y1 = y*cosX - z1*sinX;
+    const z2 = y*sinX + z1*cosX;
+    return [x1, y1, z2];
+  }
+
+  function draw(){
+    if (!W) { requestAnimationFrame(loop); return; }
+    ctx.clearRect(0,0,W,H);
+
+    // ambient glow
+    const g = ctx.createRadialGradient(cx, cy, R*0.15, cx, cy, R*1.5);
+    g.addColorStop(0, "rgba(99,102,241,0.20)");
+    g.addColorStop(0.45, "rgba(168,85,247,0.10)");
+    g.addColorStop(1, "rgba(5,6,15,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(cx, cy, R*1.5, 0, Math.PI*2); ctx.fill();
+
+    // wireframe latitude rings
+    ctx.lineWidth = 1;
+    for (let lat = -60; lat <= 60; lat += 30){
+      ctx.beginPath();
+      let started = false;
+      for (let lon = -180; lon <= 180; lon += 6){
+        const la = lat*Math.PI/180, lo = lon*Math.PI/180;
+        const [x,y,z] = rot(Math.cos(la)*Math.cos(lo), Math.sin(la), Math.cos(la)*Math.sin(lo));
+        if (z < 0) { started = false; continue; }
+        const sx = cx + x*R, sy = cy - y*R;
+        if (!started){ ctx.moveTo(sx,sy); started = true; } else ctx.lineTo(sx,sy);
+      }
+      ctx.strokeStyle = "rgba(148,163,255,0.10)";
+      ctx.stroke();
+    }
+
+    // point cloud
+    for (let i=0;i<N;i++){
+      const [x,y,z] = rot(pts[i][0], pts[i][1], pts[i][2]);
+      const sx = cx + x*R, sy = cy - y*R;
+      if (z > 0){
+        const a = 0.10 + 0.55*z;
+        ctx.fillStyle = "rgba(165,180,252," + a.toFixed(3) + ")";
+        ctx.fillRect(sx, sy, 1.6, 1.6);
+      } else if (z > -0.55){
+        ctx.fillStyle = "rgba(129,140,248,0.07)";
+        ctx.fillRect(sx, sy, 1.3, 1.3);
+      }
+    }
+
+    // hubs
+    const pulse = 0.5 + 0.5*Math.sin(t*0.06);
+    for (let i=0;i<hubs.length;i++){
+      const lat = hubs[i][0]*Math.PI/180, lon = hubs[i][1]*Math.PI/180;
+      const [x,y,z] = rot(Math.cos(lat)*Math.cos(lon), Math.sin(lat), Math.cos(lat)*Math.sin(lon));
+      if (z <= 0) continue;
+      const sx = cx + x*R, sy = cy - y*R;
+      const size = 2.2 + (i % 3) * 0.7;
+      const alpha = 0.35 + 0.6*z;
+      ctx.beginPath();
+      ctx.arc(sx, sy, size + pulse*2.2, 0, Math.PI*2);
+      ctx.fillStyle = "rgba(34,211,238," + (0.10*alpha).toFixed(3) + ")";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(sx, sy, size, 0, Math.PI*2);
+      ctx.fillStyle = "rgba(103,232,249," + alpha.toFixed(3) + ")";
+      ctx.fill();
+    }
+
+    // outer rim
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI*2);
+    ctx.strokeStyle = "rgba(165,180,252,0.16)";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+  }
+
+  function loop(){
+    if (running){
+      ry += speed;
+      rx += (targetRx - rx) * 0.05;
+      t += 1;
+      draw();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  const wrap = cv.parentElement;
+  wrap.addEventListener("pointermove", (e) => {
+    const r = cv.getBoundingClientRect();
+    const ny = (e.clientY - r.top) / r.height;
+    targetRx = -0.45 + ny * 0.6;
+    speed = 0.0032 + ((e.clientX - r.left) / r.width - 0.5) * 0.008;
+  });
+  wrap.addEventListener("pointerleave", () => { targetRx = -0.28; speed = 0.0032; });
+
+  document.addEventListener("visibilitychange", () => { running = !document.hidden; });
+
+  if ("IntersectionObserver" in window){
+    new IntersectionObserver((entries) => {
+      entries.forEach(en => { running = en.isIntersecting && !document.hidden; });
+    }, {threshold: 0.05}).observe(cv);
+  }
+
+  window.addEventListener("resize", fit);
+  window.addEventListener("load", fit);
+  fit();
+  requestAnimationFrame(loop);
+})();
+
+/* ============================================================
+   EXPLORER
+   ============================================================ */
+let activeRegion = "All";
+let searchTerm = "";
+
+(function(){
+  const chipWrap = $("#regionChips");
+  chipWrap.innerHTML = REGIONS.map((r,i) =>
+    '<button data-region="' + r + '" class="chip ' + (i===0?'active':'') + ' text-sm font-semibold px-4 py-2.5 rounded-xl text-white/70">' + r + '</button>'
+  ).join("");
+
+  chipWrap.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-region]");
+    if (!btn) return;
+    activeRegion = btn.dataset.region;
+    $$("#regionChips .chip").forEach(c => c.classList.toggle("active", c === btn));
+    renderGrid();
+  });
+
+  let tmr;
+  $("#explorerSearch").addEventListener("input", (e) => {
+    clearTimeout(tmr);
+    const v = e.target.value;
+    tmr = setTimeout(() => { searchTerm = v.trim().toLowerCase(); renderGrid(); }, 140);
+  });
+
+  $("#randomBtn").addEventListener("click", () => {
+    const i = Math.floor(Math.random() * LANGS.length);
+    openModal(i);
+  });
+
+  renderGrid();
+})();
+
+function filteredLangs(){
+  return LANGS.filter(l => {
+    const regionOk = activeRegion === "All" || l.r === activeRegion;
+    if (!regionOk) return false;
+    if (!searchTerm) return true;
+    return (l.n + " " + l.na + " " + l.s + " " + l.f + " " + l.r).toLowerCase().includes(searchTerm);
+  });
+}
+
+function renderGrid(){
+  const grid = $("#langGrid");
+  const list = filteredLangs();
+  $("#shownCount").textContent = list.length;
+  $("#emptyState").classList.toggle("hidden", list.length > 0);
+
+  grid.innerHTML = list.map((l, i) => {
+    const idx = LANGS.indexOf(l);
+    return '' +
+    '<article class="lang-card rounded-3xl p-5 cursor-pointer group" data-idx="' + idx + '" style="animation-delay:' + Math.min(i,14)*35 + 'ms">' +
+      '<div class="flex items-start justify-between gap-3">' +
+        '<div class="min-w-0">' +
+          '<p class="script-font text-2xl font-extrabold leading-tight truncate">' + l.na + '</p>' +
+          '<p class="mt-1 text-sm text-white/50 truncate">' + l.n + '</p>' +
+        '</div>' +
+        '<span class="shrink-0 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg bg-white/[0.06] border border-white/10 text-white/55">' + l.r + '</span>' +
+      '</div>' +
+      '<div class="mt-5 flex items-center justify-between text-xs text-white/45">' +
+        '<span>' + l.f + '</span>' +
+        '<span class="font-semibold text-white/70">' + fmtSpeakers(l.sp) + '</span>' +
+      '</div>' +
+      '<div class="mt-4 pt-4 border-t border-white/[0.07] flex items-center justify-between">' +
+        '<span class="flex items-center gap-2">' + diffDots(l.d) + '<span class="text-[11px] text-white/40">' + DIFF_LABEL[l.d] + '</span></span>' +
+        '<span class="text-white/30 group-hover:text-fuchsia-300 transition-colors">' +
+          '<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' +
+        '</span>' +
+      '</div>' +
+    '</article>';
+  }).join("");
+}
+
+$("#langGrid").addEventListener("click", (e) => {
+  const card = e.target.closest("[data-idx]");
+  if (!card) return;
+  openModal(parseInt(card.dataset.idx, 10));
+});
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+const modal = $("#modal");
+const modalPanel = $("#modalPanel");
+
+function openModal(idx){
+  const l = LANGS[idx];
+  if (!l) return;
+
+  const phrases = l.p.map((p, i) =>
+    '<li class="flex items-center justify-between gap-4 py-3.5 ' + (i ? 'border-t border-white/[0.07]' : '') + '">' +
+      '<div class="min-w-0">' +
+        '<p class="text-xs text-white/40 font-semibold uppercase tracking-wider">' + p[0] + '</p>' +
+        '<p class="script-font mt-1 text-xl font-bold truncate">' + p[1] + '</p>' +
+        (p[2] ? '<p class="text-xs text-white/40 mt-0.5">' + p[2] + '</p>' : '') +
+      '</div>' +
+      '<button class="speak shrink-0 grid place-items-center w-10 h-10 rounded-xl bg-white/[0.07] border border-white/12 hover:bg-white/15 transition" ' +
+        'data-say="' + p[1].replace(/"/g,'&quot;') + '" data-lang="' + l.lc + '" aria-label="Play pronunciation">' +
+        '<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>' +
+      '</button>' +
+    '</li>'
+  ).join("");
+
+  modalPanel.innerHTML = '' +
+    '<div class="p-6 sm:p-8">' +
+      '<div class="flex items-start justify-between gap-4">' +
+        '<div class="min-w-0">' +
+          '<p class="script-font text-4xl sm:text-5xl font-extrabold leading-tight break-words">' + l.na + '</p>' +
+          '<p class="mt-2 text-white/55">' + l.n + ' · <span class="text-white/40">' + l.f + ' family</span></p>' +
+        '</div>' +
+        '<button data-close class="shrink-0 grid place-items-center w-10 h-10 rounded-xl border border-white/12 hover:bg-white/10 transition" aria-label="Close">' +
+          '<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+        '</button>' +
+      '</div>' +
+
+      '<div class="mt-6 flex flex-wrap gap-2 text-xs font-semibold">' +
+        '<span class="px-3 py-1.5 rounded-lg bg-white/[0.06] border border-white/10 text-white/65">📍 ' + l.r + '</span>' +
+        '<span class="px-3 py-1.5 rounded-lg bg-white/[0.06] border border-white/10 text-white/65">✍️ ' + l.s + ' script</span>' +
+        '<span class="px-3 py-1.5 rounded-lg bg-white/[0.06] border border-white/10 text-white/65">👥 ' + fmtSpeakers(l.sp) + ' speakers</span>' +
+      '</div>' +
+
+      '<div class="mt-6 flex items-center justify-between glass rounded-2xl px-5 py-4">' +
+        '<div>' +
+          '<p class="text-[10px] uppercase tracking-widest text-white/45 font-bold">Difficulty for English speakers</p>' +
+          '<p class="mt-1 font-bold">' + DIFF_LABEL[l.d] + '</p>' +
+        '</div>' +
+        diffDots(l.d) +
+      '</div>' +
+
+      '<h4 class="mt-7 text-xs font-extrabold uppercase tracking-[0.2em] text-white/40">Starter phrases · tap to hear</h4>' +
+      '<ul class="mt-2">' + phrases + '</ul>' +
+
+      '<button id="modalPractice" class="btn-primary w-full mt-7 py-4 rounded-xl font-bold text-white">Practise ' + l.n + ' now</button>' +
+      '<p class="mt-3 text-center text-[11px] text-white/35">Free · No account required for the 4-card drill</p>' +
+    '</div>';
+
+  modal.classList.add("open");
+  document.body.style.overflow = "hidden";
+
+  const select = $("#practiceLang");
+  if (select){
+    const i = LANGS.findIndex(x => x.n === l.n);
+    if (i >= 0){ select.value = String(i); }
+  }
+  buildDeck(idx);
+}
+
+function closeModal(){
+  modal.classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+modal.addEventListener("click", (e) => {
+  if (e.target.closest("[data-close]")) closeModal();
+  const sp = e.target.closest(".speak");
+  if (sp) speak(sp.dataset.say, sp.dataset.lang);
+  if (e.target.closest("#modalPractice")){
+    closeModal();
+    const target = $("#practice");
+    target.scrollIntoView({behavior:"smooth", block:"start"});
+    setTimeout(() => { $("#card3d").classList.add("flipped"); }, 700);
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
+});
+
+/* ============================================================
+   PRACTICE — flashcard drill
+   ============================================================ */
+const practice = { langIdx: LANGS.findIndex(l => l.n === "Spanish"), deck: [], i: 0, score: 0, answered: 0, flipped: false };
+
+(function initPractice(){
+  const select = $("#practiceLang");
+  select.innerHTML = LANGS.map((l, i) => '<option value="' + i + '">' + l.n + ' — ' + l.na + '</option>').join("");
+  select.value = String(practice.langIdx);
+  select.addEventListener("change", () => {
+    practice.langIdx = parseInt(select.value, 10);
+    buildDeck(practice.langIdx);
+  });
+})();
+
+function shuffle(a){
+  const arr = a.slice();
+  for (let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function buildDeck(idx){
+  const l = LANGS[idx];
+  if (!l) return;
+  practice.langIdx = idx;
+  practice.deck = shuffle(l.p).map(p => {
+    const toNative = Math.random() < 0.5;
+    return {
+      en: p[0],
+      native: p[1],
+      roman: p[2],
+      toNative: toNative,
+      prompt: toNative ? p[0] : p[1],
+      promptSub: toNative ? "" : (p[2] || ""),
+      answer: toNative ? p[1] : p[0],
+      answerSub: toNative ? (p[2] || "") : ""
+    };
+  });
+  practice.i = 0;
+  practice.score = 0;
+  practice.answered = 0;
+  practice.flipped = false;
+
+  const sel = $("#practiceLang");
+  if (sel && parseInt(sel.value,10) !== idx) sel.value = String(idx);
+
+  $("#results").classList.add("hidden");
+  $("#card3d").classList.remove("hidden");
+  $("#practiceActions").classList.remove("hidden");
+  $("#cardCounter").parentElement.classList.remove("hidden");
+  $("#card3d").parentElement.parentElement.querySelector(".h-1\\.5").classList.remove("hidden");
+
+  renderCard();
+}
+
+function renderCard(){
+  const deck = practice.deck;
+  const card = deck[practice.i];
+  const lang = LANGS[practice.langIdx];
+  const flipEl = $("#card3d");
+
+  if (!card){ showResults(); return; }
+
+  flipEl.classList.remove("flipped");
+  practice.flipped = false;
+
+  $("#frontLang").textContent = card.toNative ? card.en + " · English" : lang.n;
+  $("#frontText").textContent = card.prompt;
+  $("#frontText").className = "script-font mt-4 text-3xl sm:text-4xl font-extrabold leading-tight px-2";
+  $("#frontSub").textContent = card.promptSub || (card.toNative ? "" : "");
+
+  $("#backLang").textContent = card.toNative ? lang.n + " · " + lang.na : "English";
+  $("#backText").textContent = card.answer;
+  $("#backSub").textContent = card.answerSub || "";
+
+  $("#cardCounter").textContent = "Card " + (practice.i + 1) + " of " + deck.length;
+  $("#scoreVal").textContent = practice.score;
+  $("#accuracyLabel").textContent = practice.answered
+    ? "Accuracy " + Math.round((practice.score / practice.answered) * 100) + "%"
+    : "Accuracy —";
+  $("#progressBar").style.width = (practice.i / deck.length * 100) + "%";
+
+  $("#flipBtn").classList.remove("hidden");
+  $("#againBtn").classList.add("hidden");
+  $("#gotBtn").classList.add("hidden");
+
+  if (card.toNative && card.roman) $("#frontSub").textContent = card.roman;
+}
+
+function flipCard(){
+  const flipEl = $("#card3d");
+  if (practice.flipped) return;
+  flipEl.classList.add("flipped");
+  practice.flipped = true;
+  $("#flipBtn").classList.add("hidden");
+  $("#againBtn").classList.remove("hidden");
+  $("#gotBtn").classList.remove("hidden");
+
+  const card = practice.deck[practice.i];
+  if (card && !card.toNative) speak(card.native, LANGS[practice.langIdx].lc);
+}
+
+function answer(known){
+  practice.answered++;
+  if (known) practice.score++;
+  $("#scoreVal").textContent = practice.score;
+  practice.i++;
+  $("#progressBar").style.width = (practice.i / practice.deck.length * 100) + "%";
+  setTimeout(() => {
+    if (practice.i >= practice.deck.length) showResults();
+    else renderCard();
+  }, 180);
+}
+
+function showResults(){
+  const total = practice.deck.length;
+  const pct = Math.round((practice.score / total) * 100);
+  $("#card3d").classList.add("hidden");
+  $("#practiceActions").classList.add("hidden");
+  $("#cardCounter").parentElement.classList.add("hidden");
+  $("#progressBar").style.width = "100%";
+  $("#results").classList.remove("hidden");
+  $("#resultsEmoji").textContent = pct >= 75 ? "🎉" : pct >= 50 ? "💪" : "🌱";
+  $("#resultsTitle").textContent = pct >= 75 ? "Excellent recall!" : pct >= 50 ? "Nice work!" : "Keep going!";
+  $("#resultsText").textContent = "You recalled " + practice.score + " of " + total + " phrases (" + pct + "%).";
+}
+
+$("#card3d").addEventListener("click", (e) => {
+  if (e.target.closest("#speakBtn")){
+    const card = practice.deck[practice.i];
+    if (card) speak(card.native, LANGS[practice.langIdx].lc);
+    return;
+  }
+  flipCard();
+});
+$("#flipBtn").addEventListener("click", flipCard);
+$("#againBtn").addEventListener("click", () => answer(false));
+$("#gotBtn").addEventListener("click", () => answer(true));
+$("#restartBtn").addEventListener("click", () => buildDeck(practice.langIdx));
+
+document.addEventListener("keydown", (e) => {
+  if (modal.classList.contains("open")) return;
+  const inView = $("#practice").getBoundingClientRect();
+  const visible = inView.top < window.innerHeight * 0.6 && inView.bottom > 0;
+  if (!visible) return;
+  if (e.code === "Space"){ e.preventDefault(); if (!practice.flipped) flipCard(); }
+  if (e.key === "1") answer(false);
+  if (e.key === "2") answer(true);
+});
+
+/* ============================================================
+   HERO SEARCH
+   ============================================================ */
+(function(){
+  const input = $("#heroSearch");
+  const box = $("#heroResults");
+
+  function render(){
+    const q = input.value.trim().toLowerCase();
+    if (!q){ box.classList.add("hidden"); box.innerHTML = ""; return; }
+    const matches = LANGS.filter(l => (l.n + " " + l.na + " " + l.s + " " + l.f + " " + l.r).toLowerCase().includes(q)).slice(0,6);
+    if (!matches.length){
+      box.innerHTML = '<p class="px-4 py-3 text-sm text-white/40">No matches — try another spelling.</p>';
+      box.classList.remove("hidden");
+      return;
+    }
+    box.innerHTML = matches.map(l => {
+      const i = LANGS.indexOf(l);
+      return '<button data-idx="' + i + '" class="w-full text-left flex items-center justify-between gap-4 px-4 py-3 rounded-xl hover:bg-white/[0.07] transition">' +
+        '<span class="min-w-0">' +
+          '<span class="block text-sm font-bold truncate">' + l.n + '</span>' +
+          '<span class="script-font block text-xs text-white/45 truncate">' + l.na + ' · ' + l.s + '</span>' +
+        '</span>' +
+        '<span class="shrink-0 text-[11px] text-white/40">' + fmtSpeakers(l.sp) + '</span>' +
+      '</button>';
+    }).join("");
+    box.classList.remove("hidden");
+  }
+
+  input.addEventListener("input", render);
+  input.addEventListener("focus", render);
+  box.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-idx]");
+    if (!b) return;
+    openModal(parseInt(b.dataset.idx, 10));
+    box.classList.add("hidden");
+    input.value = "";
+  });
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest("#heroResults") && !e.target.closest("#heroSearch")) box.classList.add("hidden");
+  });
+  document.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k"){
+      e.preventDefault(); input.focus(); input.scrollIntoView({block:"center", behavior:"smooth"});
+    }
+  });
+})();
+
+/* ============================================================
+   SCROLL REVEALS + COUNTERS
+   ============================================================ */
+(function(){
+  const els = $$(".reveal");
+  if (!("IntersectionObserver" in window)){
+    els.forEach(el => el.classList.add("in"));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en, i) => {
+      if (en.isIntersecting){
+        en.target.style.transitionDelay = Math.min(i * 60, 240) + "ms";
+        en.target.classList.add("in");
+        io.unobserve(en.target);
+      }
+    });
+  }, {threshold: 0.12, rootMargin: "0px 0px -40px 0px"});
+  els.forEach(el => io.observe(el));
+
+  // counters
+  const counters = $$("[data-count]");
+  const cio = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      const el = en.target;
+      const target = parseFloat(el.dataset.count);
+      const suffix = el.dataset.suffix || "";
+      const dur = 1600;
+      const start = performance.now();
+      function step(now){
+        const p = Math.min((now - start) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const val = Math.floor(target * eased);
+        el.textContent = val.toLocaleString() + suffix;
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = target.toLocaleString() + suffix;
+      }
+      requestAnimationFrame(step);
+      cio.unobserve(el);
+    });
+  }, {threshold: 0.5});
+  counters.forEach(c => cio.observe(c));
+})();
+
+/* ============================================================
+   MISC
+   ============================================================ */
+$("#year").textContent = new Date().getFullYear();
+
+$("#newsletter").addEventListener("submit", (e) => {
+  e.preventDefault();
+  $("#newsletterMsg").classList.remove("hidden");
+  e.target.reset();
+  setTimeout(() => $("#newsletterMsg").classList.add("hidden"), 5000);
+});
+</script>
+</body>
+</html>
